@@ -18,7 +18,7 @@ const TikcerWidgets = ({
 	useEffect(() => {
 		setData({
 			priceData: [],
-			topOfBook: { bids: [], asks: [] },
+			topOfBook: { bids: [], asks: [], spread: null, volume: null },
 		});
 	}, [selectedPair]);
 
@@ -32,6 +32,10 @@ const TikcerWidgets = ({
 					time: new Date().toLocaleTimeString(),
 					price: parseFloat(response.data.price),
 				};
+
+				const spread = response.data.ask - response.data.bid;
+				const volume = response.data.volume;
+
 				setData((prev) => ({
 					priceData: [...prev.priceData.slice(-dataPoints), newPrice],
 					topOfBook: {
@@ -43,6 +47,8 @@ const TikcerWidgets = ({
 							...prev.topOfBook.bids.slice(-dataPoints),
 							response.data.ask,
 						],
+						spread,
+						volume,
 					},
 				}));
 			} catch (error) {
@@ -58,7 +64,9 @@ const TikcerWidgets = ({
 
 	return (
 		<>
-			{showTopOfBook && <TopOfBook data={data.topOfBook} />}
+			{showTopOfBook && (
+				<TopOfBook data={data.topOfBook} selectedPair={selectedPair} />
+			)}
 			{showChart && (
 				<RealTimePriceChart selectedPair={selectedPair} data={data.priceData} />
 			)}

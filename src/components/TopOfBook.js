@@ -7,21 +7,26 @@ const WidgetContainer = styled.div`
 	border: 1px solid #ccc;
 	width: 300px;
 `;
-const DataContainer = styled.div`
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 20px;
-	width: 100%;
-	gap: 20px;
+
+const Price = styled.div`
+	font-size: 24px;
+	font-weight: bold;
+	margin: 10px 0;
 `;
 
-const Text = styled.p`
-	padding: 20px;
-	width: 100%;
+const Volume = styled.div`
+	font-size: 18px;
+	color: #666;
+	margin: 5px 0;
 `;
 
-const TopOfBook = ({ data }) => {
+const Spread = styled.div`
+	font-size: 18px;
+	color: #666;
+	margin: 5px 0;
+`;
+
+const TopOfBook = ({ selectedPair, data }) => {
 	const bestBid = data.bids
 		.map((bid) => parseFloat(bid))
 		.sort((a, b) => b - a)?.[0];
@@ -31,15 +36,12 @@ const TopOfBook = ({ data }) => {
 		.sort((a, b) => b - a)?.[0];
 	return (
 		<WidgetContainer>
-			<h3>Top of Book</h3>
-			<DataContainer>
-				<Text>
-					<b>Best Bid:</b> {bestBid}
-				</Text>
-				<Text>
-					<b>Best Ask:</b> {bestAsk}
-				</Text>
-			</DataContainer>
+			<h3>Top of Book | {selectedPair}</h3>
+			<Price>Bid: ${bestBid}</Price>
+			<Price>Ask: ${bestAsk}</Price>
+
+			<Spread>Spread: ${data?.spread?.toFixed(2)}</Spread>
+			<Volume>24h Volume: {data?.volume?.toLocaleString()}</Volume>
 		</WidgetContainer>
 	);
 };
