@@ -4,6 +4,7 @@ import OrderBook from './components/OrderBook';
 import CurrencySelector from './components/CurrencySelector';
 import SettingsModal from './components/SettingsModal';
 import TikcerWidgets from './components/TikcerWidgets';
+import PriceIncrementSelector from './components/PriceIncrementSelector';
 
 const AppContainer = styled.div`
 	display: flex;
@@ -21,6 +22,7 @@ const HeaderContainer = styled.div`
 
 function App() {
 	const [selectedPair, setSelectedPair] = useState('BTC-USD');
+	const [increment, setIncrement] = useState(0.01);
 
 	const [settings, setSettings] = useState({
 		updateInterval: 5000,
@@ -52,10 +54,17 @@ function App() {
 				selectedPair={selectedPair}
 			/>
 			{settings.showOrderBook && (
-				<OrderBook
-					selectedPair={selectedPair}
-					updateInterval={settings.updateInterval}
-				/>
+				<>
+					<PriceIncrementSelector
+						increment={increment}
+						setIncrement={setIncrement}
+					/>
+					<OrderBook
+						selectedPair={selectedPair}
+						updateInterval={settings.updateInterval}
+						increment={increment}
+					/>
+				</>
 			)}
 		</AppContainer>
 	);

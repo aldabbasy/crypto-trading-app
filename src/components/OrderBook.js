@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 
@@ -20,7 +20,7 @@ const OrderItem = styled.li`
 	margin-bottom: 5px;
 `;
 
-const OrderBook = ({ selectedPair }) => {
+const OrderBook = ({ selectedPair, increment }) => {
 	const [orderBook, setOrderBook] = useState({ bids: [], asks: [] });
 
 	useEffect(() => {
@@ -29,9 +29,20 @@ const OrderBook = ({ selectedPair }) => {
 				const response = await axios.get(
 					`https://api.pro.coinbase.com/products/${selectedPair}/book?level=2`
 				);
+
+				// Aggregate the data based on the selected increment
+				const aggregatedBids = aggregateOrderBookData(
+					response.data.bids.slice(0, 10),
+					increment
+				);
+				const aggregatedAsks = aggregateOrderBookData(
+					response.data.asks.slice(0, 10),
+					increment
+				);
+
 				setOrderBook({
-					bids: response.data.bids.slice(0, 10),
-					asks: response.data.asks.slice(0, 10),
+					bids: aggregatedBids,
+					asks: aggregatedAsks,
 				});
 			} catch (error) {
 				console.error('Error fetching order book data:', error);
@@ -42,26 +53,42 @@ const OrderBook = ({ selectedPair }) => {
 		const intervalId = setInterval(fetchOrderBook, 5000);
 
 		return () => clearInterval(intervalId);
-	}, [selectedPair]);
+	}, [increment, selectedPair]);
+
+	const aggregateOrderBookData = useCallback((orderBookData, increment) => {
+		return Object.values(
+			orderBookData.reduce((aggregatedData, order) => {
+				const aggregatedPrice = Math.floor(order?.[0] / increment) * increment;
+				if (!aggregatedData[aggregatedPrice]) {
+					aggregatedData[aggregatedPrice] = {
+						price: aggregatedPrice,
+						quantity: 0,
+					};
+				}
+				aggregatedData[aggregatedPrice].quantity += order?.[2];
+				return aggregatedData;
+			}, {})
+		);
+	}, []);
 
 	return (
 		<WidgetContainer>
 			<h3>Order Book</h3>
 			<OrderList>
 				<h4>Bids</h4>
-				{orderBook.bids.map(([price, quantity], index) => (
+				{orderBook?.bids?.map((data, index) => (
 					<OrderItem key={index}>
-						<span>{price}</span>
-						<span>{quantity}</span>
+						<span>Price: {data?.price?.toFixed(3)}</span>
+						<span>Quantity: {data?.quantity}</span>
 					</OrderItem>
 				))}
 			</OrderList>
 			<OrderList>
 				<h4>Asks</h4>
-				{orderBook.asks.map(([price, quantity], index) => (
+				{orderBook?.asks?.map((data, index) => (
 					<OrderItem key={index}>
-						<span>{price}</span>
-						<span>{quantity}</span>
+						<span>Price: {data?.price?.toFixed(3)}</span>
+						<span>Quantity: {data?.quantity}</span>
 					</OrderItem>
 				))}
 			</OrderList>
