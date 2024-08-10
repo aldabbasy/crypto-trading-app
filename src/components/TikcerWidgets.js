@@ -16,6 +16,13 @@ const TikcerWidgets = ({
 	});
 
 	useEffect(() => {
+		setData({
+			priceData: [],
+			topOfBook: { bids: [], asks: [] },
+		});
+	}, [selectedPair]);
+
+	useEffect(() => {
 		const fetchTopOfBook = async () => {
 			try {
 				const response = await axios.get(

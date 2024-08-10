@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Button } from './Button';
+import { Button } from './Styles';
 import * as Dialog from '@radix-ui/react-dialog';
 
 const ModalOverlay = styled(Dialog.Overlay)`

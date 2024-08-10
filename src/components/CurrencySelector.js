@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { Button } from './Button';
+import { Dropdown } from './Styles';
 
 const currencies = ['BTC-USD', 'ETH-USD', 'LTC-USD', 'BCH-USD'];
 
@@ -28,7 +28,10 @@ const CurrencySelector = ({ selectedPair, setSelectedPair }) => {
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
-				<Button>{selectedPair}</Button>
+				<Dropdown>
+					{selectedPair}{' '}
+					<span class='material-symbols-outlined'>arrow_drop_down</span>
+				</Dropdown>
 			</DropdownMenu.Trigger>
 			<DropdownContent>
 				{currencies.map((currency) => (
