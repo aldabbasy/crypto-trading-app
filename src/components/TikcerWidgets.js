@@ -12,7 +12,7 @@ const TikcerWidgets = ({
 }) => {
 	const [data, setData] = useState({
 		priceData: [],
-		topOfBook: { bid: null, ask: null },
+		topOfBook: { bids: [], asks: [] },
 	});
 
 	useEffect(() => {
@@ -28,8 +28,14 @@ const TikcerWidgets = ({
 				setData((prev) => ({
 					priceData: [...prev.priceData.slice(-dataPoints), newPrice],
 					topOfBook: {
-						bid: response.data.bid,
-						ask: response.data.ask,
+						bids: [
+							...prev.topOfBook.bids.slice(-dataPoints),
+							response.data.bid,
+						],
+						asks: [
+							...prev.topOfBook.bids.slice(-dataPoints),
+							response.data.ask,
+						],
 					},
 				}));
 			} catch (error) {
