@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 const WidgetContainer = styled.div`
@@ -22,18 +22,13 @@ const Text = styled.p`
 `;
 
 const TopOfBook = ({ data }) => {
-	const bestBid = useMemo(() => {
-		const sortedBids = data.bids
-			.map((bid) => parseFloat(bid))
-			.sort((a, b) => b - a);
-		return sortedBids?.[0];
-	}, [data.bids]);
-	const bestAsk = useMemo(() => {
-		const sortedAsks = data.asks
-			.map((ask) => parseFloat(ask))
-			.sort((a, b) => b - a);
-		return sortedAsks?.[0];
-	}, [data.asks]);
+	const bestBid = data.bids
+		.map((bid) => parseFloat(bid))
+		.sort((a, b) => b - a)?.[0];
+
+	const bestAsk = data.asks
+		.map((ask) => parseFloat(ask))
+		.sort((a, b) => b - a)?.[0];
 	return (
 		<WidgetContainer>
 			<h3>Top of Book</h3>
