@@ -23,6 +23,26 @@ const OrderItem = styled.li`
 const OrderBook = ({ selectedPair, increment }) => {
 	const [orderBook, setOrderBook] = useState({ bids: [], asks: [] });
 
+	const aggregateOrderBookData = useCallback(
+		(orderBookData) => {
+			return Object.values(
+				orderBookData.reduce((aggregatedData, order) => {
+					const aggregatedPrice =
+						Math.floor(order?.[0] / increment) * increment;
+					if (!aggregatedData[aggregatedPrice]) {
+						aggregatedData[aggregatedPrice] = {
+							price: aggregatedPrice,
+							quantity: 0,
+						};
+					}
+					aggregatedData[aggregatedPrice].quantity += order?.[2];
+					return aggregatedData;
+				}, {})
+			);
+		},
+		[increment]
+	);
+
 	useEffect(() => {
 		const fetchOrderBook = async () => {
 			try {
@@ -32,12 +52,10 @@ const OrderBook = ({ selectedPair, increment }) => {
 
 				// Aggregate the data based on the selected increment
 				const aggregatedBids = aggregateOrderBookData(
-					response.data.bids.slice(0, 10),
-					increment
+					response.data.bids.slice(0, 10)
 				);
 				const aggregatedAsks = aggregateOrderBookData(
-					response.data.asks.slice(0, 10),
-					increment
+					response.data.asks.slice(0, 10)
 				);
 
 				setOrderBook({
@@ -53,23 +71,7 @@ const OrderBook = ({ selectedPair, increment }) => {
 		const intervalId = setInterval(fetchOrderBook, 5000);
 
 		return () => clearInterval(intervalId);
-	}, [increment, selectedPair]);
-
-	const aggregateOrderBookData = useCallback((orderBookData, increment) => {
-		return Object.values(
-			orderBookData.reduce((aggregatedData, order) => {
-				const aggregatedPrice = Math.floor(order?.[0] / increment) * increment;
-				if (!aggregatedData[aggregatedPrice]) {
-					aggregatedData[aggregatedPrice] = {
-						price: aggregatedPrice,
-						quantity: 0,
-					};
-				}
-				aggregatedData[aggregatedPrice].quantity += order?.[2];
-				return aggregatedData;
-			}, {})
-		);
-	}, []);
+	}, [increment, selectedPair, aggregateOrderBookData]);
 
 	return (
 		<WidgetContainer>
